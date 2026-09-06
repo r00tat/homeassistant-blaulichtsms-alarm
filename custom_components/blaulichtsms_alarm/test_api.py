@@ -3,7 +3,14 @@
 import unittest
 from datetime import UTC, datetime, timedelta, timezone
 
-from .api import build_trigger_payload, format_api_datetime, redact_payload
+from .api import (
+    STAGING_BASE_URL,
+    AlarmApiClient,
+    build_trigger_payload,
+    format_api_datetime,
+    redact_payload,
+)
+from .errors import BlaulichtSmsApiError, BlaulichtSmsAuthError
 
 
 class TestFormatApiDatetime(unittest.TestCase):
@@ -138,6 +145,151 @@ class TestRedactPayload(unittest.TestCase):
         payload = {"password": "secret"}
         redact_payload(payload)
         self.assertEqual(payload["password"], "secret")
+
+
+class _FakeResponse:
+    """Minimal stand-in for an aiohttp response."""
+
+    def __init__(self, body):
+        """Store the canned body."""
+        self._body = body
+
+    async def __aenter__(self):
+        """Enter the async context."""
+        return self
+
+    async def __aexit__(self, *exc_info):
+        """Leave the async context."""
+        return False
+
+    def raise_for_status(self):
+        """Successful responses never raise."""
+
+    async def json(self):
+        """Return the canned body."""
+        return self._body
+
+
+class _FakeSession:
+    """Records the last request and returns a canned body."""
+
+    def __init__(self, body):
+        """Store the body every request answers with."""
+        self.body = body
+        self.calls = []
+
+    def post(self, url, json=None, headers=None):
+        """Record the call and hand back a fake response."""
+        self.calls.append({"url": url, "json": json, "headers": headers})
+        return _FakeResponse(self.body)
+
+
+class TestAlarmApiClient(unittest.IsolatedAsyncioTestCase):
+    """Tests for AlarmApiClient."""
+
+    def _client(self, body, **kwargs):
+        """Build a client backed by a fake session."""
+        session = _FakeSession(body)
+        client = AlarmApiClient(
+            customer_id="100027",
+            username="user",
+            password="secret",
+            session=session,
+            **kwargs,
+        )
+        return client, session
+
+    async def test_trigger_posts_to_the_live_url(self):
+        """The trigger endpoint is called on the live base url by default."""
+        client, session = self._client({"result": "OK", "alarmId": "abc"})
+        await client.trigger(alarm_type="alarm", alarm_text="Test")
+        self.assertEqual(
+            session.calls[0]["url"],
+            "https://api.blaulichtsms.net/blaulicht/api/alarm/v1/trigger",
+        )
+        self.assertEqual(session.calls[0]["json"]["alarmText"], "Test")
+
+    async def test_staging_base_url(self):
+        """A staging client posts to the staging host."""
+        client, session = self._client({"result": "OK"}, base_url=STAGING_BASE_URL)
+        await client.trigger(alarm_type="alarm")
+        self.assertTrue(
+            session.calls[0]["url"].startswith(
+                "https://api-staging.blaulichtsms.net/blaulicht"
+            )
+        )
+
+    async def test_trigger_returns_the_body(self):
+        """A successful trigger returns the parsed body."""
+        body = {"result": "OK", "alarmId": "abc", "alarmData": {"alarmId": "abc"}}
+        client, _ = self._client(body)
+        self.assertEqual(await client.trigger(alarm_type="alarm"), body)
+
+    async def test_auth_result_raises_auth_error(self):
+        """Credential related result codes raise BlaulichtSmsAuthError."""
+        client, _ = self._client(
+            {"result": "UNKNOWN_USER", "description": "no such user"}
+        )
+        with self.assertRaises(BlaulichtSmsAuthError) as ctx:
+            await client.trigger(alarm_type="alarm")
+        self.assertEqual(ctx.exception.result, "UNKNOWN_USER")
+
+    async def test_not_configured_for_customer_raises_auth_error(self):
+        """NOT_CONFIGURED_FOR_CUSTOMER is treated as an auth problem."""
+        client, _ = self._client({"result": "NOT_CONFIGURED_FOR_CUSTOMER"})
+        with self.assertRaises(BlaulichtSmsAuthError):
+            await client.trigger(alarm_type="alarm")
+
+    async def test_other_result_raises_api_error(self):
+        """Any other non-OK result raises BlaulichtSmsApiError."""
+        client, _ = self._client(
+            {"result": "INVALID_GROUP", "description": "G9 unknown"}
+        )
+        with self.assertRaises(BlaulichtSmsApiError) as ctx:
+            await client.trigger(alarm_type="alarm")
+        self.assertEqual(ctx.exception.result, "INVALID_GROUP")
+        self.assertNotIsInstance(ctx.exception, BlaulichtSmsAuthError)
+
+    async def test_missing_result_raises_api_error(self):
+        """A body without a result field is treated as an unknown error."""
+        client, _ = self._client({})
+        with self.assertRaises(BlaulichtSmsApiError) as ctx:
+            await client.trigger(alarm_type="alarm")
+        self.assertEqual(ctx.exception.result, "UNKNOWN_ERROR")
+
+    async def test_query_sends_alarm_id(self):
+        """Query posts credentials, customer id and alarm id."""
+        client, session = self._client({"result": "OK", "alarmData": {"a": 1}})
+        result = await client.query("abc")
+        self.assertEqual(
+            session.calls[0]["url"],
+            "https://api.blaulichtsms.net/blaulicht/api/alarm/v1/query",
+        )
+        self.assertEqual(session.calls[0]["json"]["alarmId"], "abc")
+        self.assertEqual(session.calls[0]["json"]["customerId"], "100027")
+        self.assertEqual(result, {"a": 1})
+
+    async def test_list_alarms_returns_the_alarm_list(self):
+        """List returns the alarms array and sends customerIds as a list."""
+        client, session = self._client({"result": "OK", "alarms": [{"a": 1}]})
+        result = await client.list_alarms()
+        self.assertEqual(session.calls[0]["json"]["customerIds"], ["100027"])
+        self.assertNotIn("startDate", session.calls[0]["json"])
+        self.assertEqual(result, [{"a": 1}])
+
+    async def test_list_alarms_formats_the_date_range(self):
+        """Start and end date are serialised in the API date format."""
+        client, session = self._client({"result": "OK", "alarms": []})
+        await client.list_alarms(
+            start_date=datetime(2026, 1, 1, 0, 0, tzinfo=UTC),
+            end_date=datetime(2026, 1, 2, 0, 0, tzinfo=UTC),
+        )
+        self.assertEqual(
+            session.calls[0]["json"]["startDate"], "2026-01-01T00:00:00.000Z"
+        )
+        self.assertEqual(
+            session.calls[0]["json"]["endDate"], "2026-01-02T00:00:00.000Z"
+        )
 
 
 if __name__ == "__main__":

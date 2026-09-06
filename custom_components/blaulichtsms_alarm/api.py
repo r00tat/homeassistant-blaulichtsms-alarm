@@ -9,6 +9,10 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
+import aiohttp
+
+from .errors import BlaulichtSmsApiError, BlaulichtSmsAuthError
+
 LIVE_BASE_URL = "https://api.blaulichtsms.net/blaulicht"
 STAGING_BASE_URL = "https://api-staging.blaulichtsms.net/blaulicht"
 
@@ -94,3 +98,116 @@ def build_trigger_payload(
         payload["geolocation"] = {"address": address}
 
     return payload
+
+
+AUTH_RESULT_CODES = frozenset(
+    {
+        "UNKNOWN_USER",
+        "NOT_AUTHORIZED",
+        "NOT_CONFIGURED_FOR_CUSTOMER",
+        "INVALID_CUSTOMER_ID",
+        "DEACTIVATED",
+    }
+)
+
+TRIGGER_PATH = "/api/alarm/v1/trigger"
+QUERY_PATH = "/api/alarm/v1/query"
+LIST_PATH = "/api/alarm/v1/list"
+
+
+class AlarmApiClient:
+    """Async client for the blaulichtSMS Alarm API.
+
+    The alarm API has no login endpoint: credentials are sent with every
+    request.
+    """
+
+    def __init__(
+        self,
+        customer_id: str,
+        username: str,
+        password: str,
+        base_url: str = LIVE_BASE_URL,
+        session: aiohttp.ClientSession | None = None,
+    ) -> None:
+        """Create a client for one customer id."""
+        self.customer_id = customer_id
+        self.username = username
+        self.password = password
+        self.base_url = base_url.rstrip("/")
+        self._session = session
+
+    @property
+    def _credentials(self) -> dict[str, Any]:
+        """Return the credential fields every request carries."""
+        return {"username": self.username, "password": self.password}
+
+    async def trigger(self, **kwargs: Any) -> dict[str, Any]:
+        """Trigger an alarm or info and return the API response body."""
+        payload = build_trigger_payload(
+            customer_id=self.customer_id,
+            username=self.username,
+            password=self.password,
+            **kwargs,
+        )
+        return await self._post(TRIGGER_PATH, payload)
+
+    async def query(self, alarm_id: str) -> dict[str, Any]:
+        """Return the alarm data for a single alarm id."""
+        payload = {
+            **self._credentials,
+            "customerId": self.customer_id,
+            "alarmId": alarm_id,
+        }
+        body = await self._post(QUERY_PATH, payload)
+        return body.get("alarmData") or {}
+
+    async def list_alarms(
+        self,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+    ) -> list[dict[str, Any]]:
+        """Return up to 100 alarms, optionally limited to a date range."""
+        payload: dict[str, Any] = {
+            **self._credentials,
+            "customerIds": [self.customer_id],
+        }
+        if start_date is not None:
+            payload["startDate"] = format_api_datetime(start_date)
+        if end_date is not None:
+            payload["endDate"] = format_api_datetime(end_date)
+        body = await self._post(LIST_PATH, payload)
+        return body.get("alarms") or []
+
+    async def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
+        """POST a payload and return the checked response body."""
+        url = f"{self.base_url}{path}"
+        _LOGGER.debug("POST %s %s", url, redact_payload(payload))
+        if self._session is None:
+            async with aiohttp.ClientSession() as owned:
+                body = await self._request(owned, url, payload)
+        else:
+            body = await self._request(self._session, url, payload)
+        return self._check_result(body)
+
+    @staticmethod
+    async def _request(
+        session: aiohttp.ClientSession, url: str, payload: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Perform the POST and return the parsed JSON body."""
+        async with session.post(
+            url, json=payload, headers={"Content-Type": "application/json"}
+        ) as response:
+            response.raise_for_status()
+            return await response.json()
+
+    @staticmethod
+    def _check_result(body: dict[str, Any]) -> dict[str, Any]:
+        """Raise on a non-OK result code, otherwise return the body."""
+        result = body.get("result")
+        if result == "OK":
+            return body
+        description = body.get("description")
+        if result in AUTH_RESULT_CODES:
+            raise BlaulichtSmsAuthError(result, description)
+        raise BlaulichtSmsApiError(result or "UNKNOWN_ERROR", description)
