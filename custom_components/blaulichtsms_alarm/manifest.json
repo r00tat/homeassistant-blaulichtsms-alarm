@@ -1,0 +1,15 @@
+{
+  "domain": "blaulichtsms_alarm",
+  "name": "blaulichtSMS Alarm",
+  "documentation": "https://github.com/r00tat/homeassistant-blaulichtsms-alarm",
+  "issue_tracker": "https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues",
+  "dependencies": [],
+  "requirements": [],
+  "config_flow": true,
+  "iot_class": "cloud_push",
+  "integration_type": "service",
+  "codeowners": [
+    "@r00tat"
+  ],
+  "version": "0.1.0"
+}
