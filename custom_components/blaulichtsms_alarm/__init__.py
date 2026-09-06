@@ -1,0 +1,1 @@
+"""The blaulichtSMS Alarm integration."""
