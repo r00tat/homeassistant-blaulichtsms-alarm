@@ -19,6 +19,11 @@ als die des Einsatzmonitors.
 
 ## Installation
 
+[![In Home Assistant öffnen und dieses Repository in HACS hinzufügen.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=r00tat&repository=homeassistant-blaulichtsms-alarm&category=integration)
+
+Der Button öffnet das Repository direkt in HACS. Danach installieren und Home
+Assistant neu starten. Alternativ von Hand:
+
 1. HACS öffnen, 3 Punkte, "Benutzerdefinierte Repositories"
 2. `https://github.com/r00tat/homeassistant-blaulichtsms-alarm` als Repository,
    Kategorie `Integration`
@@ -150,4 +155,4 @@ uv run python -m unittest discover -v  # Tests
 ## Lizenz
 
 Diese Software steht in keiner Verbindung zu blaulichtSMS. Lizenziert unter
-[Apache License 2.0](LICENSE).
+[GNU General Public License v3.0](LICENSE).
