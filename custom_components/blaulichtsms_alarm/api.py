@@ -6,6 +6,7 @@ See https://github.com/blaulichtSMS/docs/blob/master/alarm_api_v1.md
 from __future__ import annotations
 
 import logging
+import re
 from datetime import UTC, datetime
 from typing import Any
 
@@ -113,6 +114,34 @@ AUTH_RESULT_CODES = frozenset(
 TRIGGER_PATH = "/api/alarm/v1/trigger"
 QUERY_PATH = "/api/alarm/v1/query"
 LIST_PATH = "/api/alarm/v1/list"
+
+
+_GROUP_CODE_RE = re.compile(r"^G(\d+)$")
+
+
+def _group_sort_key(code: str) -> tuple[int, int, str]:
+    """Sort G<number> codes numerically and everything else after them."""
+    if match := _GROUP_CODE_RE.match(code):
+        return (0, int(match.group(1)), "")
+    return (1, 0, code)
+
+
+def extract_alarm_groups(alarms: list[dict[str, Any]]) -> dict[str, str]:
+    """Return the alarm groups seen in a list response, id mapped to name.
+
+    The alarm API has no endpoint that lists the configured alarm groups, so
+    the inventory is derived from the groups of the returned alarms. It is
+    therefore a suggestion, not the full truth: a group that was not alerted
+    recently does not show up.
+    """
+    groups: dict[str, str] = {}
+    for alarm in alarms:
+        for group in alarm.get("alarmGroups") or []:
+            code = (group.get("groupId") or "").strip()
+            if not code:
+                continue
+            groups.setdefault(code, (group.get("groupName") or "").strip() or code)
+    return {code: groups[code] for code in sorted(groups, key=_group_sort_key)}
 
 
 class AlarmApiClient:

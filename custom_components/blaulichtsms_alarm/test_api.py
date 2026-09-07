@@ -4,6 +4,7 @@ import unittest
 from datetime import UTC, datetime, timedelta, timezone
 
 from .api import (
+    extract_alarm_groups,
     STAGING_BASE_URL,
     AlarmApiClient,
     build_trigger_payload,
@@ -290,6 +291,68 @@ class TestAlarmApiClient(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(
             session.calls[0]["json"]["endDate"], "2026-01-02T00:00:00.000Z"
         )
+
+
+class TestExtractAlarmGroups(unittest.TestCase):
+    """The alarm group inventory derived from a list response."""
+
+    def test_returns_an_empty_mapping_for_no_alarms(self):
+        """Without alarms there is nothing to suggest."""
+        self.assertEqual(extract_alarm_groups([]), {})
+
+    def test_maps_group_ids_to_group_names(self):
+        """Each alarm group contributes its id and name."""
+        alarms = [
+            {"alarmGroups": [{"groupId": "G1", "groupName": "Gesamtwehr"}]},
+        ]
+        self.assertEqual(extract_alarm_groups(alarms), {"G1": "Gesamtwehr"})
+
+    def test_deduplicates_groups_across_alarms(self):
+        """A group alerted repeatedly is reported once."""
+        alarms = [
+            {"alarmGroups": [{"groupId": "G1", "groupName": "Gesamtwehr"}]},
+            {"alarmGroups": [{"groupId": "G1", "groupName": "Gesamtwehr"}]},
+        ]
+        self.assertEqual(extract_alarm_groups(alarms), {"G1": "Gesamtwehr"})
+
+    def test_sorts_numeric_group_codes_naturally(self):
+        """G10 comes after G2, not after G1."""
+        alarms = [
+            {
+                "alarmGroups": [
+                    {"groupId": "G10", "groupName": "ten"},
+                    {"groupId": "G2", "groupName": "two"},
+                    {"groupId": "G1", "groupName": "one"},
+                ]
+            }
+        ]
+        self.assertEqual(list(extract_alarm_groups(alarms)), ["G1", "G2", "G10"])
+
+    def test_sorts_non_numeric_codes_after_numeric_ones(self):
+        """Codes that do not follow the G<number> scheme go last."""
+        alarms = [
+            {
+                "alarmGroups": [
+                    {"groupId": "SONDER", "groupName": "special"},
+                    {"groupId": "G2", "groupName": "two"},
+                ]
+            }
+        ]
+        self.assertEqual(list(extract_alarm_groups(alarms)), ["G2", "SONDER"])
+
+    def test_falls_back_to_the_group_id_when_the_name_is_missing(self):
+        """A group without a name is still selectable."""
+        alarms = [{"alarmGroups": [{"groupId": "G3", "groupName": None}]}]
+        self.assertEqual(extract_alarm_groups(alarms), {"G3": "G3"})
+
+    def test_ignores_alarms_and_groups_without_a_group_id(self):
+        """Malformed entries never end up in the inventory."""
+        alarms = [
+            {"alarmGroups": None},
+            {},
+            {"alarmGroups": [{"groupName": "nameless"}, {"groupId": ""}]},
+        ]
+        self.assertEqual(extract_alarm_groups(alarms), {})
 
 
 if __name__ == "__main__":
