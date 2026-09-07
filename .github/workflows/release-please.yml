@@ -1,0 +1,43 @@
+name: "Release Please"
+
+on:
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: googleapis/release-please-action@v5
+        id: release
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+      - uses: actions/checkout@v7.0.1
+        if: ${{ steps.release.outputs.release_created }}
+
+      - name: "ZIP the integration directory"
+        if: ${{ steps.release.outputs.release_created }}
+        shell: "bash"
+        run: |
+          cd "$GITHUB_WORKSPACE/custom_components/blaulichtsms_alarm"
+          zip blaulichtsms_alarm.zip -r ./
+
+      - name: "Upload the ZIP file to the release"
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.release.outputs.tag_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh release upload "$TAG_NAME" \
+            "$GITHUB_WORKSPACE/custom_components/blaulichtsms_alarm/blaulichtsms_alarm.zip" \
+            --repo "$REPO"
