@@ -17,6 +17,9 @@ from .errors import BlaulichtSmsApiError, BlaulichtSmsAuthError
 LIVE_BASE_URL = "https://api.blaulichtsms.net/blaulicht"
 STAGING_BASE_URL = "https://api-staging.blaulichtsms.net/blaulicht"
 
+# The list endpoint never returns more than this many alarms.
+MAX_LIST_LIMIT = 100
+
 _LOGGER = logging.getLogger(__name__)
 
 _OPTIONAL_FIELDS = {
@@ -144,6 +147,23 @@ def extract_alarm_groups(alarms: list[dict[str, Any]]) -> dict[str, str]:
     return {code: groups[code] for code in sorted(groups, key=_group_sort_key)}
 
 
+def select_latest_alarms(
+    alarms: list[dict[str, Any]], limit: int
+) -> list[dict[str, Any]]:
+    """Return at most limit alarms, the newest one first.
+
+    The list endpoint has no limit parameter and its order is only documented
+    as "sorted by the end date", so the newest alarms are picked here instead
+    of trusting the position in the response.
+    """
+    ordered = sorted(
+        alarms,
+        key=lambda alarm: alarm.get("alarmDate") or alarm.get("endDate") or "",
+        reverse=True,
+    )
+    return ordered[:limit]
+
+
 class AlarmApiClient:
     """Async client for the blaulichtSMS Alarm API.
 
@@ -195,8 +215,14 @@ class AlarmApiClient:
         self,
         start_date: datetime | None = None,
         end_date: datetime | None = None,
+        limit: int | None = None,
     ) -> list[dict[str, Any]]:
-        """Return up to 100 alarms, optionally limited to a date range."""
+        """Return up to 100 alarms, optionally limited to a date range.
+
+        The API caps the response at 100 alarms and offers no limit parameter,
+        so limit is applied to the response: it keeps the newest alarms, the
+        newest one first.
+        """
         payload: dict[str, Any] = {
             **self._credentials,
             "customerIds": [self.customer_id],
@@ -206,7 +232,10 @@ class AlarmApiClient:
         if end_date is not None:
             payload["endDate"] = format_api_datetime(end_date)
         body = await self._post(LIST_PATH, payload)
-        return body.get("alarms") or []
+        alarms = body.get("alarms") or []
+        if limit is None:
+            return alarms
+        return select_latest_alarms(alarms, limit)
 
     async def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
         """POST a payload and return the checked response body."""

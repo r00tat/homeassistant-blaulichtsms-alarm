@@ -4,12 +4,13 @@ import unittest
 from datetime import UTC, datetime, timedelta, timezone
 
 from .api import (
-    extract_alarm_groups,
     STAGING_BASE_URL,
     AlarmApiClient,
     build_trigger_payload,
+    extract_alarm_groups,
     format_api_datetime,
     redact_payload,
+    select_latest_alarms,
 )
 from .errors import BlaulichtSmsApiError, BlaulichtSmsAuthError
 
@@ -278,6 +279,32 @@ class TestAlarmApiClient(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("startDate", session.calls[0]["json"])
         self.assertEqual(result, [{"a": 1}])
 
+    async def test_list_alarms_applies_the_limit_without_sending_it(self):
+        """The API has no limit parameter, so the response is trimmed."""
+        client, session = self._client(
+            {
+                "result": "OK",
+                "alarms": [
+                    {"alarmId": "old", "alarmDate": "2026-01-01T10:00:00.000Z"},
+                    {"alarmId": "new", "alarmDate": "2026-02-01T10:00:00.000Z"},
+                ],
+            }
+        )
+        result = await client.list_alarms(limit=1)
+        self.assertEqual([alarm["alarmId"] for alarm in result], ["new"])
+        self.assertNotIn("limit", session.calls[0]["json"])
+
+    async def test_list_alarms_returns_everything_without_a_limit(self):
+        """Without a limit the response order is left untouched."""
+        client, _ = self._client(
+            {
+                "result": "OK",
+                "alarms": [{"alarmId": "a"}, {"alarmId": "b"}],
+            }
+        )
+        result = await client.list_alarms()
+        self.assertEqual([alarm["alarmId"] for alarm in result], ["a", "b"])
+
     async def test_list_alarms_formats_the_date_range(self):
         """Start and end date are serialised in the API date format."""
         client, session = self._client({"result": "OK", "alarms": []})
@@ -353,6 +380,48 @@ class TestExtractAlarmGroups(unittest.TestCase):
             {"alarmGroups": [{"groupName": "nameless"}, {"groupId": ""}]},
         ]
         self.assertEqual(extract_alarm_groups(alarms), {})
+
+
+class TestSelectLatestAlarms(unittest.TestCase):
+    """The client side limit on a list response."""
+
+    _ALARMS = [
+        {"alarmId": "old", "alarmDate": "2026-01-01T10:00:00.000Z"},
+        {"alarmId": "new", "alarmDate": "2026-03-01T10:00:00.000Z"},
+        {"alarmId": "mid", "alarmDate": "2026-02-01T10:00:00.000Z"},
+    ]
+
+    def test_returns_the_newest_alarms_first(self):
+        """The limit keeps the newest alarms, not the first of the response."""
+        result = select_latest_alarms(self._ALARMS, 2)
+        self.assertEqual([alarm["alarmId"] for alarm in result], ["new", "mid"])
+
+    def test_a_limit_above_the_response_size_returns_everything(self):
+        """Asking for more than there is is not an error."""
+        result = select_latest_alarms(self._ALARMS, 10)
+        self.assertEqual(len(result), 3)
+
+    def test_falls_back_to_the_end_date_when_the_alarm_date_is_missing(self):
+        """An alarm without alarmDate is ordered by its end date."""
+        alarms = [
+            {"alarmId": "a", "alarmDate": "2026-01-01T10:00:00.000Z"},
+            {"alarmId": "b", "endDate": "2026-05-01T10:00:00.000Z"},
+        ]
+        result = select_latest_alarms(alarms, 1)
+        self.assertEqual(result[0]["alarmId"], "b")
+
+    def test_alarms_without_any_date_are_ordered_last(self):
+        """An undatable alarm never displaces a dated one."""
+        alarms = [
+            {"alarmId": "undated"},
+            {"alarmId": "dated", "alarmDate": "2020-01-01T10:00:00.000Z"},
+        ]
+        result = select_latest_alarms(alarms, 1)
+        self.assertEqual(result[0]["alarmId"], "dated")
+
+    def test_an_empty_response_stays_empty(self):
+        """Nothing to select from is not an error."""
+        self.assertEqual(select_latest_alarms([], 5), [])
 
 
 if __name__ == "__main__":
