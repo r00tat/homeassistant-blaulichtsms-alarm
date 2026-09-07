@@ -1,8 +1,8 @@
 """Unit tests for the blaulichtSMS Alarm services."""
 
-import unittest
 from datetime import UTC, datetime
 from types import SimpleNamespace
+import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp

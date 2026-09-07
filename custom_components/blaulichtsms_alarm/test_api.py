@@ -1,7 +1,7 @@
 """Unit tests for the blaulichtSMS Alarm API client."""
 
-import unittest
 from datetime import UTC, datetime, timedelta, timezone
+import unittest
 
 from .api import (
     STAGING_BASE_URL,

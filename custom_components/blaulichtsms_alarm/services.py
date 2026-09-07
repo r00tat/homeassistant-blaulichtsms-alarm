@@ -50,11 +50,7 @@ from .const import (
     TYPE_INFO,
 )
 from .errors import BlaulichtSmsApiError, BlaulichtSmsAuthError
-from .group_filter import (
-    GroupNotAllowedError,
-    GroupsRequiredError,
-    resolve_group_codes,
-)
+from .group_filter import GroupNotAllowedError, GroupsRequiredError, resolve_group_codes
 
 _LOGGER = logging.getLogger(__name__)
 

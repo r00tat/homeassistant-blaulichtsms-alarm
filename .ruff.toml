@@ -12,6 +12,7 @@ select = [
     "D",  # docstrings
     "E",  # pycodestyle
     "F",  # pyflakes/autoflake
+    "I",  # isort
     "ICN001", # import concentions; {name} should be imported as {asname}
     "PGH004",  # Use specific rule codes when using noqa
     "PLC0414", # Useless import alias. Import alias does not rename original package.
@@ -40,6 +41,12 @@ ignore = [
     "E501",  # line too long
     "E731",  # do not assign a lambda expression, use a def
 ]
+
+[lint.isort]
+force-sort-within-sections = true
+known-first-party = ["homeassistant"]
+combine-as-imports = true
+split-on-trailing-comma = false
 
 [lint.flake8-pytest-style]
 fixture-parentheses = false

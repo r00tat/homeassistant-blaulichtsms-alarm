@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Mapping
+import logging
 from typing import Any, NamedTuple
 
 import aiohttp
@@ -13,12 +13,7 @@ from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import (
-    LIVE_BASE_URL,
-    STAGING_BASE_URL,
-    AlarmApiClient,
-    extract_alarm_groups,
-)
+from .api import LIVE_BASE_URL, STAGING_BASE_URL, AlarmApiClient, extract_alarm_groups
 from .const import (
     CONF_CUSTOMER_ID,
     CONF_PASSWORD,

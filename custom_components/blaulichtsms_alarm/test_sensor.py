@@ -1,8 +1,8 @@
 """Unit tests for the last triggered alarm sensor."""
 
-import unittest
 from datetime import UTC, datetime
 from types import SimpleNamespace
+import unittest
 from unittest.mock import MagicMock
 
 from .const import TYPE_ALARM

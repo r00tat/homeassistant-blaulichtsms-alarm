@@ -5,9 +5,9 @@ See https://github.com/blaulichtSMS/docs/blob/master/alarm_api_v1.md
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 import logging
 import re
-from datetime import UTC, datetime
 from typing import Any
 
 import aiohttp
