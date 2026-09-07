@@ -1,0 +1,296 @@
+{
+  "title": "blaulichtSMS Alarm",
+  "config": {
+    "step": {
+      "user": {
+        "title": "blaulichtSMS Alarm API",
+        "description": "Zugangsdaten des für deine Kundennummer auf start.blaulichtsms.net eingerichteten automatischen Alarmgebers eintragen. Das ist ein eigener Benutzer: weder der Dashboard-Benutzer noch der normale Portal-Login funktionieren hier. Die Prüfung erfolgt über eine reine Leseabfrage; es wird kein Alarm ausgelöst.",
+        "data": {
+          "customer_id": "Kundennummer",
+          "username": "Benutzername",
+          "password": "Passwort",
+          "use_staging": "Test-API verwenden (api-staging.blaulichtsms.net)"
+        }
+      },
+      "groups": {
+        "title": "Alarmgruppen-Filter",
+        "description": "Optional: Einschränkung, welche Alarmgruppen alarmiert werden dürfen. Die Gruppen der letzten Alarme werden zur Auswahl angeboten; die API kann nicht alle konfigurierten Gruppen auflisten, eine länger nicht alarmierte Gruppe lässt sich daher einfach eintippen. Ist ein Filter gesetzt, muss jeder Service-Aufruf seine Gruppen ausdrücklich nennen und es werden nur diese Gruppen akzeptiert. Leer lassen, um alle Gruppen zu erlauben.",
+        "data": {
+          "group_filter": "Erlaubte Alarmgruppen"
+        }
+      },
+      "reauth_confirm": {
+        "title": "blaulichtSMS Alarm erneut authentifizieren",
+        "description": "Die Zugangsdaten sind nicht mehr gültig. Bitte erneut eingeben.",
+        "data": {
+          "username": "Benutzername",
+          "password": "Passwort"
+        }
+      },
+      "reconfigure": {
+        "title": "blaulichtSMS Alarm Zugangsdaten ändern",
+        "description": "Benutzername und Passwort des automatischen Alarmauslösers aktualisieren.",
+        "data": {
+          "username": "Benutzername",
+          "password": "Passwort"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Authentifizierung fehlgeschlagen. Kundennummer, Benutzername und Passwort prüfen.",
+      "cannot_connect": "Die blaulichtSMS Alarm API ist nicht erreichbar",
+      "unknown": "Die blaulichtSMS Alarm API hat einen unerwarteten Fehler gemeldet"
+    },
+    "abort": {
+      "already_configured": "Diese Kundennummer ist bereits konfiguriert",
+      "reauth_successful": "Erneute Authentifizierung erfolgreich",
+      "reconfigure_successful": "Zugangsdaten erfolgreich aktualisiert"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Alarmgruppen-Filter",
+        "description": "Einschränkung, welche Alarmgruppen alarmiert werden dürfen. Die Gruppen der letzten Alarme werden zur Auswahl angeboten, fehlende Gruppencodes können eingetippt werden. Leer lassen, um alle Gruppen zu erlauben.",
+        "data": {
+          "group_filter": "Erlaubte Alarmgruppen"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "last_triggered": { "name": "Zuletzt ausgelöster Alarm" }
+    }
+  },
+  "exceptions": {
+    "no_entry": {
+      "message": "Es ist kein blaulichtSMS Alarm Konto konfiguriert."
+    },
+    "entry_required": {
+      "message": "Es sind mehrere blaulichtSMS Alarm Konten konfiguriert. Wähle eines über das Feld config_entry aus."
+    },
+    "entry_not_found": {
+      "message": "Kein geladenes blaulichtSMS Alarm Konto mit der ID {entry_id}."
+    },
+    "groups_required": {
+      "message": "Es ist ein Alarmgruppen-Filter konfiguriert, daher müssen group_codes angegeben werden. Erlaubte Gruppen: {allowed}."
+    },
+    "group_not_allowed": {
+      "message": "Die Alarmgruppen {groups} sind nicht erlaubt. Erlaubte Gruppen: {allowed}."
+    },
+    "msisdns_not_allowed": {
+      "message": "additional_msisdns kann nicht verwendet werden, solange ein Alarmgruppen-Filter konfiguriert ist, weil einzelne Rufnummern den Filter umgehen würden."
+    }
+  },
+  "services": {
+    "trigger_alarm": {
+      "name": "Alarm auslösen",
+      "description": "Löst sofort einen blaulichtSMS Alarm aus.",
+      "fields": {
+        "config_entry": {
+          "name": "Konto",
+          "description": "Das zu verwendende blaulichtSMS Konto. Kann entfallen, wenn nur eines konfiguriert ist."
+        },
+        "alarm_text": { "name": "Alarmtext", "description": "Text des Alarms." },
+        "group_codes": {
+          "name": "Alarmgruppen",
+          "description": "Zu alarmierende Gruppencodes, z. B. G1. Pflicht, wenn ein Gruppen-Filter konfiguriert ist."
+        },
+        "needs_acknowledgement": {
+          "name": "Rückmeldefunktion",
+          "description": "Empfänger um Rückmeldung bitten, ob sie kommen."
+        },
+        "duration": {
+          "name": "Rückmeldefenster",
+          "description": "Wie lange die Rückmeldefunktion offen bleibt. Laut blaulichtSMS Dokumentation in Minuten."
+        },
+        "template": {
+          "name": "Alarmtext-Code",
+          "description": "Code eines hinterlegten Alarmtextes, z. B. A1."
+        },
+        "index_number": {
+          "name": "Indexnummer",
+          "description": "Eine erneut verwendete Indexnummer aktualisiert den Text dieses Alarms, statt einen neuen auszulösen."
+        },
+        "additional_msisdns": {
+          "name": "Zusätzliche Rufnummern",
+          "description": "Weitere zu alarmierende Rufnummern. Gesperrt, solange ein Alarmgruppen-Filter konfiguriert ist."
+        },
+        "hide_trigger_details": {
+          "name": "Auslöser verbergen",
+          "description": "Keine Details darüber senden, wer den Alarm ausgelöst hat."
+        },
+        "recipient_confirmation": {
+          "name": "Zustellbestätigung",
+          "description": "Bestätigen, dass die SMS empfangen wurde. Kostenpflichtig."
+        },
+        "recipient_confirmation_target": {
+          "name": "Empfänger der Bestätigung",
+          "description": "Rufnummer, die die Zustellbestätigung erhält."
+        },
+        "location": {
+          "name": "Einsatzort",
+          "description": "Koordinaten des Einsatzortes. Haben Vorrang vor der Adresse."
+        },
+        "address": {
+          "name": "Adresse",
+          "description": "Adresse des Einsatzortes; blaulichtSMS wandelt sie in Koordinaten um."
+        }
+      }
+    },
+    "send_info": {
+      "name": "Info senden",
+      "description": "Sendet sofort eine blaulichtSMS Info.",
+      "fields": {
+        "config_entry": {
+          "name": "Konto",
+          "description": "Das zu verwendende blaulichtSMS Konto. Kann entfallen, wenn nur eines konfiguriert ist."
+        },
+        "alarm_text": { "name": "Infotext", "description": "Text der Info." },
+        "group_codes": {
+          "name": "Alarmgruppen",
+          "description": "Zu verständigende Gruppencodes, z. B. G1. Pflicht, wenn ein Gruppen-Filter konfiguriert ist."
+        },
+        "needs_acknowledgement": {
+          "name": "Rückmeldefunktion",
+          "description": "Empfänger um eine Rückmeldung bitten."
+        },
+        "duration": {
+          "name": "Rückmeldefenster",
+          "description": "Wie lange die Rückmeldefunktion offen bleibt. Laut blaulichtSMS Dokumentation in Minuten."
+        },
+        "template": {
+          "name": "Text-Code",
+          "description": "Code eines hinterlegten Textes, z. B. A1."
+        },
+        "index_number": {
+          "name": "Indexnummer",
+          "description": "Eine erneut verwendete Indexnummer aktualisiert den Text dieser Nachricht."
+        },
+        "additional_msisdns": {
+          "name": "Zusätzliche Rufnummern",
+          "description": "Weitere zu verständigende Rufnummern. Gesperrt, solange ein Alarmgruppen-Filter konfiguriert ist."
+        },
+        "hide_trigger_details": {
+          "name": "Auslöser verbergen",
+          "description": "Keine Details darüber senden, wer die Info gesendet hat."
+        },
+        "recipient_confirmation": {
+          "name": "Zustellbestätigung",
+          "description": "Bestätigen, dass die SMS empfangen wurde. Kostenpflichtig."
+        },
+        "recipient_confirmation_target": {
+          "name": "Empfänger der Bestätigung",
+          "description": "Rufnummer, die die Zustellbestätigung erhält."
+        },
+        "location": {
+          "name": "Ort",
+          "description": "Anzuhängende Koordinaten. Haben Vorrang vor der Adresse."
+        },
+        "address": {
+          "name": "Adresse",
+          "description": "Anzuhängende Adresse; blaulichtSMS wandelt sie in Koordinaten um."
+        }
+      }
+    },
+    "create_appointment": {
+      "name": "Termin erstellen",
+      "description": "Erstellt einen blaulichtSMS Termin: eine Info, die zu einem zukünftigen Zeitpunkt zugestellt wird.",
+      "fields": {
+        "config_entry": {
+          "name": "Konto",
+          "description": "Das zu verwendende blaulichtSMS Konto. Kann entfallen, wenn nur eines konfiguriert ist."
+        },
+        "start_date": {
+          "name": "Datum und Uhrzeit",
+          "description": "Wann die Terminnachricht gesendet wird."
+        },
+        "alarm_text": {
+          "name": "Termintext",
+          "description": "Text des Termins."
+        },
+        "group_codes": {
+          "name": "Alarmgruppen",
+          "description": "Einzuladende Gruppencodes, z. B. G1. Pflicht, wenn ein Gruppen-Filter konfiguriert ist."
+        },
+        "needs_acknowledgement": {
+          "name": "Rückmeldefunktion",
+          "description": "Empfänger um Rückmeldung bitten, ob sie teilnehmen."
+        },
+        "duration": {
+          "name": "Rückmeldefenster",
+          "description": "Wie lange die Rückmeldefunktion offen bleibt. Laut blaulichtSMS Dokumentation in Minuten."
+        },
+        "template": {
+          "name": "Text-Code",
+          "description": "Code eines hinterlegten Textes, z. B. A1."
+        },
+        "index_number": {
+          "name": "Indexnummer",
+          "description": "Eine erneut verwendete Indexnummer aktualisiert diesen Termin."
+        },
+        "additional_msisdns": {
+          "name": "Zusätzliche Rufnummern",
+          "description": "Weitere einzuladende Rufnummern. Gesperrt, solange ein Alarmgruppen-Filter konfiguriert ist."
+        },
+        "hide_trigger_details": {
+          "name": "Auslöser verbergen",
+          "description": "Keine Details darüber senden, wer den Termin erstellt hat."
+        },
+        "recipient_confirmation": {
+          "name": "Zustellbestätigung",
+          "description": "Bestätigen, dass die SMS empfangen wurde. Kostenpflichtig."
+        },
+        "recipient_confirmation_target": {
+          "name": "Empfänger der Bestätigung",
+          "description": "Rufnummer, die die Zustellbestätigung erhält."
+        },
+        "location": {
+          "name": "Ort",
+          "description": "Koordinaten des Termins. Haben Vorrang vor der Adresse."
+        },
+        "address": {
+          "name": "Adresse",
+          "description": "Adresse des Termins; blaulichtSMS wandelt sie in Koordinaten um."
+        }
+      }
+    },
+    "query_alarm": {
+      "name": "Alarm abfragen",
+      "description": "Liefert die aktuellen Daten eines einzelnen Alarms samt Rückmeldungen.",
+      "fields": {
+        "config_entry": {
+          "name": "Konto",
+          "description": "Das zu verwendende blaulichtSMS Konto. Kann entfallen, wenn nur eines konfiguriert ist."
+        },
+        "alarm_id": {
+          "name": "Alarm-ID",
+          "description": "Die ID, die beim Auslösen des Alarms zurückgegeben wurde."
+        }
+      }
+    },
+    "list_alarms": {
+      "name": "Alarme auflisten",
+      "description": "Liefert bis zu 100 Alarme der konfigurierten Kundennummer.",
+      "fields": {
+        "config_entry": {
+          "name": "Konto",
+          "description": "Das zu verwendende blaulichtSMS Konto. Kann entfallen, wenn nur eines konfiguriert ist."
+        },
+        "start_date": {
+          "name": "Von",
+          "description": "Nur Alarme, die nach diesem Zeitpunkt geendet haben."
+        },
+        "end_date": {
+          "name": "Bis",
+          "description": "Nur Alarme, die vor diesem Zeitpunkt begonnen haben."
+        },
+        "limit": {
+          "name": "Anzahl der Alarme",
+          "description": "Maximale Anzahl der zurückgelieferten Alarme, neuester zuerst. Ohne Angabe werden alle Alarme der Antwort zurückgeliefert. Die API begrenzt die Antwort auf 100 Alarme und kennt keinen Limit-Parameter, die Begrenzung wird daher auf die Antwort angewendet."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,296 @@
+{
+  "title": "blaulichtSMS Alarm",
+  "config": {
+    "step": {
+      "user": {
+        "title": "blaulichtSMS Alarm API",
+        "description": "Enter the credentials of the automatic alarm trigger configured for your customer id on start.blaulichtsms.net. This is a separate user of its own: neither your dashboard login nor your normal portal login works here. The credentials are verified with a read-only request; no alarm is triggered.",
+        "data": {
+          "customer_id": "Customer ID",
+          "username": "Username",
+          "password": "Password",
+          "use_staging": "Use the test API (api-staging.blaulichtsms.net)"
+        }
+      },
+      "groups": {
+        "title": "Alarm group filter",
+        "description": "Optional: restrict which alarm groups may be alerted. The groups of the recent alarms are offered for selection; the API cannot list all configured groups, so a group that was not alerted lately can simply be typed in. If a filter is set, every service call must name its groups explicitly and only these groups are accepted. Leave empty to allow all groups.",
+        "data": {
+          "group_filter": "Allowed alarm groups"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate blaulichtSMS Alarm",
+        "description": "Your credentials are no longer valid. Please enter them again.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Change blaulichtSMS Alarm credentials",
+        "description": "Update the username and password of the automatic alarm trigger.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Authentication failed. Check customer ID, username and password.",
+      "cannot_connect": "Could not reach the blaulichtSMS alarm API",
+      "unknown": "The blaulichtSMS alarm API returned an unexpected error"
+    },
+    "abort": {
+      "already_configured": "This customer is already configured",
+      "reauth_successful": "Re-authentication successful",
+      "reconfigure_successful": "Credentials updated successfully"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Alarm group filter",
+        "description": "Restrict which alarm groups may be alerted. The groups of the recent alarms are offered for selection, missing group codes can be typed in. Leave empty to allow all groups.",
+        "data": {
+          "group_filter": "Allowed alarm groups"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "last_triggered": { "name": "Last triggered alarm" }
+    }
+  },
+  "exceptions": {
+    "no_entry": {
+      "message": "No blaulichtSMS Alarm account is configured."
+    },
+    "entry_required": {
+      "message": "Several blaulichtSMS Alarm accounts are configured. Choose one with the config_entry field."
+    },
+    "entry_not_found": {
+      "message": "No loaded blaulichtSMS Alarm account with the id {entry_id}."
+    },
+    "groups_required": {
+      "message": "An alarm group filter is configured, so group_codes must be given. Allowed groups: {allowed}."
+    },
+    "group_not_allowed": {
+      "message": "The alarm groups {groups} are not allowed. Allowed groups: {allowed}."
+    },
+    "msisdns_not_allowed": {
+      "message": "additional_msisdns cannot be used while an alarm group filter is configured, because single numbers would bypass the filter."
+    }
+  },
+  "services": {
+    "trigger_alarm": {
+      "name": "Trigger alarm",
+      "description": "Triggers a blaulichtSMS alarm immediately.",
+      "fields": {
+        "config_entry": {
+          "name": "Account",
+          "description": "The blaulichtSMS account to use. Can be omitted if only one is configured."
+        },
+        "alarm_text": { "name": "Alarm text", "description": "Text of the alarm." },
+        "group_codes": {
+          "name": "Alarm groups",
+          "description": "Group codes to alert, for example G1. Required if a group filter is configured."
+        },
+        "needs_acknowledgement": {
+          "name": "Reply function",
+          "description": "Ask recipients to confirm whether they are coming."
+        },
+        "duration": {
+          "name": "Reply window",
+          "description": "How long the reply function stays open. According to the blaulichtSMS documentation the value is in minutes."
+        },
+        "template": {
+          "name": "Alarm text code",
+          "description": "Code of a predefined alarm text, for example A1."
+        },
+        "index_number": {
+          "name": "Index number",
+          "description": "Reusing an index number updates the text of that alarm instead of creating a new one."
+        },
+        "additional_msisdns": {
+          "name": "Additional numbers",
+          "description": "Extra phone numbers to alert. Blocked while an alarm group filter is configured."
+        },
+        "hide_trigger_details": {
+          "name": "Hide trigger details",
+          "description": "Do not send details about who triggered the alarm."
+        },
+        "recipient_confirmation": {
+          "name": "Delivery confirmation",
+          "description": "Confirm that the SMS was received. Additional charges apply."
+        },
+        "recipient_confirmation_target": {
+          "name": "Confirmation recipient",
+          "description": "Phone number that receives the delivery confirmation."
+        },
+        "location": {
+          "name": "Location",
+          "description": "Coordinates of the incident. Takes precedence over the address."
+        },
+        "address": {
+          "name": "Address",
+          "description": "Address of the incident; blaulichtSMS converts it to coordinates."
+        }
+      }
+    },
+    "send_info": {
+      "name": "Send info",
+      "description": "Sends a blaulichtSMS info message immediately.",
+      "fields": {
+        "config_entry": {
+          "name": "Account",
+          "description": "The blaulichtSMS account to use. Can be omitted if only one is configured."
+        },
+        "alarm_text": { "name": "Info text", "description": "Text of the info." },
+        "group_codes": {
+          "name": "Alarm groups",
+          "description": "Group codes to notify, for example G1. Required if a group filter is configured."
+        },
+        "needs_acknowledgement": {
+          "name": "Reply function",
+          "description": "Ask recipients to reply."
+        },
+        "duration": {
+          "name": "Reply window",
+          "description": "How long the reply function stays open. According to the blaulichtSMS documentation the value is in minutes."
+        },
+        "template": {
+          "name": "Text code",
+          "description": "Code of a predefined text, for example A1."
+        },
+        "index_number": {
+          "name": "Index number",
+          "description": "Reusing an index number updates the text of that message."
+        },
+        "additional_msisdns": {
+          "name": "Additional numbers",
+          "description": "Extra phone numbers to notify. Blocked while an alarm group filter is configured."
+        },
+        "hide_trigger_details": {
+          "name": "Hide trigger details",
+          "description": "Do not send details about who sent the info."
+        },
+        "recipient_confirmation": {
+          "name": "Delivery confirmation",
+          "description": "Confirm that the SMS was received. Additional charges apply."
+        },
+        "recipient_confirmation_target": {
+          "name": "Confirmation recipient",
+          "description": "Phone number that receives the delivery confirmation."
+        },
+        "location": {
+          "name": "Location",
+          "description": "Coordinates to attach. Takes precedence over the address."
+        },
+        "address": {
+          "name": "Address",
+          "description": "Address to attach; blaulichtSMS converts it to coordinates."
+        }
+      }
+    },
+    "create_appointment": {
+      "name": "Create appointment",
+      "description": "Creates a blaulichtSMS appointment: an info message delivered at a future point in time.",
+      "fields": {
+        "config_entry": {
+          "name": "Account",
+          "description": "The blaulichtSMS account to use. Can be omitted if only one is configured."
+        },
+        "start_date": {
+          "name": "Date and time",
+          "description": "When the appointment message is sent."
+        },
+        "alarm_text": {
+          "name": "Appointment text",
+          "description": "Text of the appointment."
+        },
+        "group_codes": {
+          "name": "Alarm groups",
+          "description": "Group codes to invite, for example G1. Required if a group filter is configured."
+        },
+        "needs_acknowledgement": {
+          "name": "Reply function",
+          "description": "Ask recipients to confirm whether they are attending."
+        },
+        "duration": {
+          "name": "Reply window",
+          "description": "How long the reply function stays open. According to the blaulichtSMS documentation the value is in minutes."
+        },
+        "template": {
+          "name": "Text code",
+          "description": "Code of a predefined text, for example A1."
+        },
+        "index_number": {
+          "name": "Index number",
+          "description": "Reusing an index number updates that appointment."
+        },
+        "additional_msisdns": {
+          "name": "Additional numbers",
+          "description": "Extra phone numbers to invite. Blocked while an alarm group filter is configured."
+        },
+        "hide_trigger_details": {
+          "name": "Hide trigger details",
+          "description": "Do not send details about who created the appointment."
+        },
+        "recipient_confirmation": {
+          "name": "Delivery confirmation",
+          "description": "Confirm that the SMS was received. Additional charges apply."
+        },
+        "recipient_confirmation_target": {
+          "name": "Confirmation recipient",
+          "description": "Phone number that receives the delivery confirmation."
+        },
+        "location": {
+          "name": "Location",
+          "description": "Coordinates of the appointment. Takes precedence over the address."
+        },
+        "address": {
+          "name": "Address",
+          "description": "Address of the appointment; blaulichtSMS converts it to coordinates."
+        }
+      }
+    },
+    "query_alarm": {
+      "name": "Query alarm",
+      "description": "Returns the current data of a single alarm, including the replies.",
+      "fields": {
+        "config_entry": {
+          "name": "Account",
+          "description": "The blaulichtSMS account to use. Can be omitted if only one is configured."
+        },
+        "alarm_id": {
+          "name": "Alarm ID",
+          "description": "The id returned when the alarm was triggered."
+        }
+      }
+    },
+    "list_alarms": {
+      "name": "List alarms",
+      "description": "Returns up to 100 alarms of the configured customer.",
+      "fields": {
+        "config_entry": {
+          "name": "Account",
+          "description": "The blaulichtSMS account to use. Can be omitted if only one is configured."
+        },
+        "start_date": {
+          "name": "From",
+          "description": "Only alarms that ended after this point in time."
+        },
+        "end_date": {
+          "name": "Until",
+          "description": "Only alarms that started before this point in time."
+        },
+        "limit": {
+          "name": "Number of alarms",
+          "description": "Maximum number of alarms to return, newest first. Without it every alarm of the response is returned. The API caps the response at 100 alarms and has no limit parameter, so the limit is applied to the response."
+        }
+      }
+    }
+  }
+}

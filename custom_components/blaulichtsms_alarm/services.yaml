@@ -1,0 +1,193 @@
+trigger_alarm: &trigger_fields
+  fields:
+    config_entry:
+      required: false
+      selector:
+        config_entry:
+          integration: blaulichtsms_alarm
+    alarm_text:
+      required: false
+      example: "Brand B2, Hauptstraße 1"
+      selector:
+        text:
+          multiline: true
+    group_codes:
+      required: false
+      example: "['G1', 'G2']"
+      selector:
+        text:
+          multiple: true
+    needs_acknowledgement:
+      required: false
+      default: true
+      selector:
+        boolean:
+    duration:
+      required: false
+      example: 60
+      selector:
+        number:
+          min: 1
+          max: 1440
+          mode: box
+    template:
+      required: false
+      example: "A1"
+      selector:
+        text:
+    index_number:
+      required: false
+      example: 1
+      selector:
+        number:
+          min: 0
+          max: 999999
+          mode: box
+    additional_msisdns:
+      required: false
+      advanced: true
+      example: "['+4366412345678']"
+      selector:
+        text:
+          multiple: true
+    hide_trigger_details:
+      required: false
+      advanced: true
+      selector:
+        boolean:
+    recipient_confirmation:
+      required: false
+      advanced: true
+      selector:
+        boolean:
+    recipient_confirmation_target:
+      required: false
+      advanced: true
+      example: "+4366412345678"
+      selector:
+        text:
+    location:
+      required: false
+      selector:
+        location:
+    address:
+      required: false
+      example: "Getreidemarkt 11, 1060 Wien"
+      selector:
+        text:
+
+send_info: *trigger_fields
+
+create_appointment:
+  fields:
+    config_entry:
+      required: false
+      selector:
+        config_entry:
+          integration: blaulichtsms_alarm
+    start_date:
+      required: true
+      example: "2026-10-01 18:00:00"
+      selector:
+        datetime:
+    alarm_text:
+      required: false
+      example: "Monatsschulung im Rüsthaus"
+      selector:
+        text:
+          multiline: true
+    group_codes:
+      required: false
+      example: "['G1']"
+      selector:
+        text:
+          multiple: true
+    needs_acknowledgement:
+      required: false
+      default: true
+      selector:
+        boolean:
+    duration:
+      required: false
+      example: 60
+      selector:
+        number:
+          min: 1
+          max: 1440
+          mode: box
+    template:
+      required: false
+      selector:
+        text:
+    index_number:
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 999999
+          mode: box
+    additional_msisdns:
+      required: false
+      advanced: true
+      selector:
+        text:
+          multiple: true
+    hide_trigger_details:
+      required: false
+      advanced: true
+      selector:
+        boolean:
+    recipient_confirmation:
+      required: false
+      advanced: true
+      selector:
+        boolean:
+    recipient_confirmation_target:
+      required: false
+      advanced: true
+      selector:
+        text:
+    location:
+      required: false
+      selector:
+        location:
+    address:
+      required: false
+      selector:
+        text:
+
+query_alarm:
+  fields:
+    config_entry:
+      required: false
+      selector:
+        config_entry:
+          integration: blaulichtsms_alarm
+    alarm_id:
+      required: true
+      example: "dakldjsfal-2343232-afsdaddfa-234"
+      selector:
+        text:
+
+list_alarms:
+  fields:
+    config_entry:
+      required: false
+      selector:
+        config_entry:
+          integration: blaulichtsms_alarm
+    start_date:
+      required: false
+      selector:
+        datetime:
+    end_date:
+      required: false
+      selector:
+        datetime:
+    limit:
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 100
+          mode: box
