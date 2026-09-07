@@ -115,8 +115,10 @@ container_id="$(docker ps -a -q -f "name=^${DOCKER_NAME}\$")"
 # per docker restart nicht ändern — Abweichung erkennen statt stillschweigend
 # den alten Container weiterlaufen zu lassen.
 if [[ -n "$container_id" && "$RECREATE" -eq 0 ]]; then
+  # HostConfig.PortBindings, nicht NetworkSettings.Ports: letzteres ist bei
+  # einem gestoppten Container leer und würde eine Änderung vortäuschen.
   current_port="$(docker inspect "$container_id" \
-    --format '{{with index .NetworkSettings.Ports "8123/tcp"}}{{(index . 0).HostPort}}{{end}}')"
+    --format '{{with index .HostConfig.PortBindings "8123/tcp"}}{{(index . 0).HostPort}}{{end}}')"
   if [[ "$current_port" != "$HTTP_PORT" ]]; then
     warn "Bestehender Container veröffentlicht Port ${current_port:-<keinen>}, gewünscht ist $HTTP_PORT."
     warn "Portmappings sind unveränderlich — Container wird neu angelegt."
@@ -126,6 +128,9 @@ fi
 
 if [[ -n "$container_id" && "$RECREATE" -eq 1 ]]; then
   log "Entferne bestehenden Container $DOCKER_NAME"
+  # Erst geordnet stoppen, damit Home Assistant seine SQLite-Datenbank in
+  # config/ sauber schließt; rm -f allein wäre ein SIGKILL.
+  docker stop -t 30 "$DOCKER_NAME" >/dev/null 2>&1 || true
   docker rm -f "$DOCKER_NAME" >/dev/null
   container_id=""
 fi
@@ -144,6 +149,23 @@ info "Der erste Start dauert 20-30 s, bis die Oberfläche antwortet."
 info "Komponente neu laden: ./dev.sh erneut ausführen (spiegelt + startet neu)."
 
 if [[ "$FOLLOW_LOGS" -eq 1 ]]; then
-  log "Container-Logs (Ctrl-C beendet nur das Mitlesen, nicht den Container)"
-  docker logs -n 10 -f "$DOCKER_NAME"
+  # Ctrl-C stoppt die Testinstanz, statt nur das Mitlesen zu beenden. Wer den
+  # Container weiterlaufen lassen will, startet mit --no-logs.
+  stop_container() {
+    trap - INT TERM
+    log "Stoppe Container $DOCKER_NAME"
+    # Home Assistant braucht für ein sauberes Herunterfahren mehr als die 10 s
+    # Kulanz, die docker stop standardmäßig vor dem SIGKILL gewährt.
+    docker stop -t 30 "$DOCKER_NAME" >/dev/null
+    info "Gestoppt. Neu starten: ./dev.sh"
+    exit 0
+  }
+  trap stop_container INT TERM
+
+  log "Container-Logs — Ctrl-C stoppt die Testinstanz"
+  # Endet das Tailing von selbst, ist der Container weg oder abgestürzt.
+  docker logs -n 10 -f "$DOCKER_NAME" || true
+  trap - INT TERM
+  warn "Log-Tailing beendet — Container läuft nicht mehr."
+  docker ps -a -f "name=^${DOCKER_NAME}\$" --format '    {{.Names}}: {{.Status}}'
 fi
