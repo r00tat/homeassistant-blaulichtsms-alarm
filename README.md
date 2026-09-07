@@ -29,13 +29,32 @@ als die des Einsatzmonitors.
 
 Der Wizard hat zwei Schritte:
 
-1. **Zugangsdaten** — Kundennummer, Benutzername, Passwort. Optional kann die
-   Test-API verwendet werden, um Automatisierungen gefahrlos zu erproben. Die
-   Prüfung erfolgt über eine reine Leseabfrage, es wird kein Alarm ausgelöst.
-2. **Alarmgruppen-Filter** — optionale, kommagetrennte Liste der Gruppencodes,
-   die alarmiert werden dürfen.
+1. **Zugangsdaten** — Kundennummer, Benutzername, Passwort des **automatischen
+   Alarmgebers**, der auf start.blaulichtsms.net für die Kundennummer
+   eingerichtet wird. Das ist ein eigener Benutzer: weder der
+   Dashboard-Benutzer noch der normale Portal-Login funktionieren an der Alarm
+   API. Optional kann die Test-API verwendet werden, um Automatisierungen
+   gefahrlos zu erproben. Die Prüfung erfolgt über eine reine Leseabfrage, es
+   wird kein Alarm ausgelöst.
+2. **Alarmgruppen-Filter** — optionale Mehrfachauswahl der Gruppencodes, die
+   alarmiert werden dürfen.
 
 Der Filter lässt sich später über "Konfigurieren" ändern.
+
+### Woher die Gruppen-Vorschläge kommen
+
+Die Alarm API hat keinen Endpunkt, der die konfigurierten Alarmgruppen
+auflistet. Die Auswahl wird deshalb aus der Leseabfrage abgeleitet, mit der die
+Zugangsdaten geprüft werden: `list` liefert bis zu 100 Alarme, jeder davon mit
+seinen Gruppen samt Name. Daraus entsteht eine Liste wie `G1 – Gesamtwehr`.
+
+Das kostet keinen zusätzlichen Request, ist aber nur ein Vorschlag: eine Gruppe,
+die in diesen 100 Alarmen nicht vorkommt — neu angelegt oder selten alarmiert —
+fehlt. Deshalb sind eigene Eingaben im Auswahlfeld weiterhin erlaubt.
+
+Die anderen blaulichtSMS-APIs helfen hier nicht: Dashboard-, Export- und
+Import-API verwenden jeweils eigene Benutzer, und die Import-API überschreibt
+laut Dokumentation ohnehin alle Gruppen und Zuordnungen.
 
 ### Wirkung des Filters
 

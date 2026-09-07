@@ -26,20 +26,25 @@ No test touches the network. Async tests use `unittest.IsolatedAsyncioTestCase`,
 
 ## Architecture
 
-- `api.py` — `AlarmApiClient` plus the pure `build_trigger_payload`. No Home
-  Assistant imports. The alarm API has no login endpoint; credentials go with
-  every request. Non-OK `result` codes raise `BlaulichtSmsApiError`, credential
-  related ones `BlaulichtSmsAuthError`.
-- `group_filter.py` — pure functions. `parse_group_filter` splits the configured
-  string, `resolve_group_codes` enforces it: with a filter set, group codes are
-  mandatory and must all be inside the filter, otherwise nothing is triggered.
+- `api.py` — `AlarmApiClient` plus the pure `build_trigger_payload` and
+  `extract_alarm_groups`. No Home Assistant imports. The alarm API has no login
+  endpoint; credentials go with every request. Non-OK `result` codes raise
+  `BlaulichtSmsApiError`, credential related ones `BlaulichtSmsAuthError`.
+- `group_filter.py` — pure functions. `parse_group_filter` normalises the
+  configured filter, accepting both the list the config flow stores and the
+  comma separated string of older entries. `resolve_group_codes` enforces it:
+  with a filter set, group codes are mandatory and must all be inside the
+  filter, otherwise nothing is triggered.
 - `services.py` — five services. `trigger_alarm` (`type=alarm`), `send_info`
   (`type=info`), `create_appointment` (`type=info` + `startDate`), `query_alarm`
   and `list_alarms`. Registered once in `async_setup`. Handlers are module level
   coroutines so they can be tested without a running Home Assistant.
 - `config_flow.py` — two step wizard (credentials, group filter) plus options,
   reauth and reconfigure. Credentials are validated with a read-only `list`
-  call; it must never trigger an alarm.
+  call; it must never trigger an alarm. That same response feeds the alarm
+  group suggestions of the filter step — the API has no endpoint that lists
+  groups, so the suggestions are incomplete by design and the multi select
+  keeps `custom_value` enabled.
 - `__init__.py` — builds the client, verifies the credentials and stores
   `BlaulichtSmsAlarmRuntimeData` in `entry.runtime_data`. Nothing goes into
   `hass.data`.
