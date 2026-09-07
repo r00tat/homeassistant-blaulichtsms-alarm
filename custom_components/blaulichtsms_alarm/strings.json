@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "blaulichtSMS Alarm API",
-        "description": "Enter the credentials of the automatic alarm trigger configured for your customer id. The credentials are verified with a read-only request; no alarm is triggered.",
+        "description": "Enter the credentials of the automatic alarm trigger configured for your customer id on start.blaulichtsms.net. This is a separate user of its own: neither your dashboard login nor your normal portal login works here. The credentials are verified with a read-only request; no alarm is triggered.",
         "data": {
           "customer_id": "Customer ID",
           "username": "Username",
@@ -14,7 +14,7 @@
       },
       "groups": {
         "title": "Alarm group filter",
-        "description": "Optional: comma separated list of alarm group codes that may be alerted, for example G1,G2. If a filter is set, every service call must name its groups explicitly and only these groups are accepted. Leave empty to allow all groups.",
+        "description": "Optional: restrict which alarm groups may be alerted. The groups of the recent alarms are offered for selection; the API cannot list all configured groups, so a group that was not alerted lately can simply be typed in. If a filter is set, every service call must name its groups explicitly and only these groups are accepted. Leave empty to allow all groups.",
         "data": {
           "group_filter": "Allowed alarm groups"
         }
@@ -51,7 +51,7 @@
     "step": {
       "init": {
         "title": "Alarm group filter",
-        "description": "Comma separated list of alarm group codes that may be alerted. Leave empty to allow all groups.",
+        "description": "Restrict which alarm groups may be alerted. The groups of the recent alarms are offered for selection, missing group codes can be typed in. Leave empty to allow all groups.",
         "data": {
           "group_filter": "Allowed alarm groups"
         }

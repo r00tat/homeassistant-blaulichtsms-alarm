@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "blaulichtSMS Alarm API",
-        "description": "Zugangsdaten des für deine Kundennummer eingerichteten automatischen Alarmauslösers eintragen. Die Prüfung erfolgt über eine reine Leseabfrage; es wird kein Alarm ausgelöst.",
+        "description": "Zugangsdaten des für deine Kundennummer auf start.blaulichtsms.net eingerichteten automatischen Alarmgebers eintragen. Das ist ein eigener Benutzer: weder der Dashboard-Benutzer noch der normale Portal-Login funktionieren hier. Die Prüfung erfolgt über eine reine Leseabfrage; es wird kein Alarm ausgelöst.",
         "data": {
           "customer_id": "Kundennummer",
           "username": "Benutzername",
@@ -14,7 +14,7 @@
       },
       "groups": {
         "title": "Alarmgruppen-Filter",
-        "description": "Optional: kommagetrennte Liste der Gruppencodes, die alarmiert werden dürfen, z. B. G1,G2. Ist ein Filter gesetzt, muss jeder Service-Aufruf seine Gruppen ausdrücklich nennen und es werden nur diese Gruppen akzeptiert. Leer lassen, um alle Gruppen zu erlauben.",
+        "description": "Optional: Einschränkung, welche Alarmgruppen alarmiert werden dürfen. Die Gruppen der letzten Alarme werden zur Auswahl angeboten; die API kann nicht alle konfigurierten Gruppen auflisten, eine länger nicht alarmierte Gruppe lässt sich daher einfach eintippen. Ist ein Filter gesetzt, muss jeder Service-Aufruf seine Gruppen ausdrücklich nennen und es werden nur diese Gruppen akzeptiert. Leer lassen, um alle Gruppen zu erlauben.",
         "data": {
           "group_filter": "Erlaubte Alarmgruppen"
         }
@@ -51,7 +51,7 @@
     "step": {
       "init": {
         "title": "Alarmgruppen-Filter",
-        "description": "Kommagetrennte Liste der Gruppencodes, die alarmiert werden dürfen. Leer lassen, um alle Gruppen zu erlauben.",
+        "description": "Einschränkung, welche Alarmgruppen alarmiert werden dürfen. Die Gruppen der letzten Alarme werden zur Auswahl angeboten, fehlende Gruppencodes können eingetippt werden. Leer lassen, um alle Gruppen zu erlauben.",
         "data": {
           "group_filter": "Erlaubte Alarmgruppen"
         }
