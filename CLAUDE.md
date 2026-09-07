@@ -26,8 +26,9 @@ No test touches the network. Async tests use `unittest.IsolatedAsyncioTestCase`,
 
 ## Architecture
 
-- `api.py` — `AlarmApiClient` plus the pure `build_trigger_payload` and
-  `extract_alarm_groups`. No Home Assistant imports. The alarm API has no login
+- `api.py` — `AlarmApiClient` plus the pure `build_trigger_payload`,
+  `extract_alarm_groups` and `select_latest_alarms`. No Home Assistant
+  imports. The alarm API has no login
   endpoint; credentials go with every request. Non-OK `result` codes raise
   `BlaulichtSmsApiError`, credential related ones `BlaulichtSmsAuthError`.
 - `group_filter.py` — pure functions. `parse_group_filter` normalises the
@@ -37,7 +38,9 @@ No test touches the network. Async tests use `unittest.IsolatedAsyncioTestCase`,
   filter, otherwise nothing is triggered.
 - `services.py` — five services. `trigger_alarm` (`type=alarm`), `send_info`
   (`type=info`), `create_appointment` (`type=info` + `startDate`), `query_alarm`
-  and `list_alarms`. Registered once in `async_setup`. Handlers are module level
+  and `list_alarms`. The `limit` field of `list_alarms` has no counterpart in
+  the API: it is applied to the response by `select_latest_alarms`, capped at
+  `MAX_LIST_LIMIT`. Registered once in `async_setup`. Handlers are module level
   coroutines so they can be tested without a running Home Assistant.
 - `config_flow.py` — two step wizard (credentials, group filter) plus options,
   reauth and reconfigure. Credentials are validated with a read-only `list`

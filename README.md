@@ -100,6 +100,18 @@ data:
   group_codes: ["G1"]
 ```
 
+```yaml
+actions:
+  - action: blaulichtsms_alarm.list_alarms
+    data:
+      limit: 5
+    response_variable: letzte
+```
+
+`limit` begrenzt die Antwort auf die neuesten `n` Alarme, neuester zuerst. Die
+API kennt keinen Limit-Parameter und liefert immer bis zu 100 Alarme, sortiert
+nach Endzeitpunkt; die Begrenzung wird deshalb auf die Antwort angewendet.
+
 Die auslösenden Services geben `alarm_id`, `result` und `alarm_data` zurück:
 
 ```yaml
