@@ -29,6 +29,18 @@ class TestParseGroupFilter(unittest.TestCase):
         """Stray commas do not create empty codes."""
         self.assertEqual(parse_group_filter("G1,,G2,"), ["G1", "G2"])
 
+    def test_accepts_a_list_of_group_codes(self):
+        """The multi select in the config flow stores a list, not a string."""
+        self.assertEqual(parse_group_filter(["G1", "G2"]), ["G1", "G2"])
+
+    def test_strips_and_drops_empty_entries_of_a_list(self):
+        """Whitespace and blank entries of a list are ignored."""
+        self.assertEqual(parse_group_filter([" G1 ", "", "  "]), ["G1"])
+
+    def test_returns_an_empty_list_for_an_empty_list(self):
+        """An empty selection means no filter."""
+        self.assertEqual(parse_group_filter([]), [])
+
 
 class TestResolveGroupCodes(unittest.TestCase):
     """Tests for resolve_group_codes."""

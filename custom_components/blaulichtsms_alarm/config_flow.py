@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, NamedTuple
 
 import aiohttp
 
@@ -13,7 +13,12 @@ from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import LIVE_BASE_URL, STAGING_BASE_URL, AlarmApiClient
+from .api import (
+    LIVE_BASE_URL,
+    STAGING_BASE_URL,
+    AlarmApiClient,
+    extract_alarm_groups,
+)
 from .const import (
     CONF_CUSTOMER_ID,
     CONF_PASSWORD,
@@ -33,13 +38,22 @@ from .schema import (
 _LOGGER = logging.getLogger(__name__)
 
 
+class CredentialCheck(NamedTuple):
+    """Result of a credential check: form errors and discovered alarm groups."""
+
+    errors: dict[str, str]
+    groups: dict[str, str]
+
+
 async def validate_credentials(
     hass: HomeAssistant, data: Mapping[str, Any]
-) -> dict[str, str]:
+) -> CredentialCheck:
     """Check credentials with a read-only list call.
 
-    Returns a dict of form errors, empty when the credentials work. The list
-    endpoint is used on purpose: it never triggers an alarm.
+    The list endpoint is used on purpose: it never triggers an alarm. Its
+    response also carries the alarm groups of the returned alarms, which are
+    offered as suggestions in the group filter step, so no extra request is
+    needed for them.
     """
     client = AlarmApiClient(
         customer_id=data[CONF_CUSTOMER_ID],
@@ -49,17 +63,30 @@ async def validate_credentials(
         session=async_get_clientsession(hass),
     )
     try:
-        await client.list_alarms()
+        alarms = await client.list_alarms()
     except BlaulichtSmsAuthError:
         _LOGGER.warning("blaulichtSMS alarm api rejected the credentials")
-        return {"base": "invalid_auth"}
+        return CredentialCheck({"base": "invalid_auth"}, {})
     except aiohttp.ClientError:
         _LOGGER.exception("could not reach the blaulichtSMS alarm api")
-        return {"base": "cannot_connect"}
+        return CredentialCheck({"base": "cannot_connect"}, {})
     except BlaulichtSmsApiError:
         _LOGGER.exception("blaulichtSMS alarm api returned an error")
-        return {"base": "unknown"}
-    return {}
+        return CredentialCheck({"base": "unknown"}, {})
+    return CredentialCheck({}, extract_alarm_groups(alarms))
+
+
+async def discover_alarm_groups(client: AlarmApiClient) -> dict[str, str]:
+    """Return the alarm groups of the recent alarms, empty on any failure.
+
+    Used by the options flow, where a temporarily unreachable API must not stop
+    the user from editing the group filter.
+    """
+    try:
+        return extract_alarm_groups(await client.list_alarms())
+    except BlaulichtSmsApiError, aiohttp.ClientError:
+        _LOGGER.debug("could not discover alarm groups", exc_info=True)
+        return {}
 
 
 class BlaulichtSmsAlarmConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -70,6 +97,7 @@ class BlaulichtSmsAlarmConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def __init__(self) -> None:
         """Start with an empty set of collected data."""
         self._data: dict[str, Any] = {}
+        self._groups: dict[str, str] = {}
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -84,7 +112,7 @@ class BlaulichtSmsAlarmConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
             )
             self._abort_if_unique_id_configured()
-            errors = await validate_credentials(self.hass, user_input)
+            errors, self._groups = await validate_credentials(self.hass, user_input)
             if not errors:
                 self._data = dict(user_input)
                 return await self.async_step_groups()
@@ -105,7 +133,9 @@ class BlaulichtSmsAlarmConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 ),
                 data={**self._data, **user_input},
             )
-        return self.async_show_form(step_id="groups", data_schema=groups_schema())
+        return self.async_show_form(
+            step_id="groups", data_schema=groups_schema(groups=self._groups)
+        )
 
     async def async_step_reauth(
         self, entry_data: Mapping[str, Any]
@@ -148,7 +178,7 @@ class BlaulichtSmsAlarmConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         if user_input is not None:
             merged = {**entry.data, **user_input}
-            errors = await validate_credentials(self.hass, merged)
+            errors, _ = await validate_credentials(self.hass, merged)
             if not errors:
                 self.hass.config_entries.async_update_entry(entry, data=merged)
                 return self.async_abort(reason=abort_reason)
@@ -177,6 +207,7 @@ class BlaulichtSmsAlarmOptionsFlow(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=user_input)
 
         defaults = {**self.config_entry.data, **self.config_entry.options}
+        groups = await discover_alarm_groups(self.config_entry.runtime_data.client)
         return self.async_show_form(
-            step_id="init", data_schema=groups_schema(defaults)
+            step_id="init", data_schema=groups_schema(defaults, groups)
         )

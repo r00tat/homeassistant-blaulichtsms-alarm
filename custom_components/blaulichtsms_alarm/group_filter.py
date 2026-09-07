@@ -24,11 +24,16 @@ class GroupNotAllowedError(GroupFilterError):
         super().__init__(f"group codes not allowed: {', '.join(invalid)}")
 
 
-def parse_group_filter(raw: str | None) -> list[str]:
-    """Split a comma separated group filter into a list of group codes."""
+def parse_group_filter(raw: str | list[str] | None) -> list[str]:
+    """Normalise a configured group filter into a list of group codes.
+
+    The config flow stores a list, but entries created before the group multi
+    select existed hold a comma separated string, so both are accepted.
+    """
     if not raw:
         return []
-    return [code.strip() for code in raw.split(",") if code.strip()]
+    codes = raw.split(",") if isinstance(raw, str) else raw
+    return [code.strip() for code in codes if code and code.strip()]
 
 
 def resolve_group_codes(
