@@ -104,7 +104,8 @@ letzten Auslösung über diese Integration. Attribute: `alarm_id`, `alarm_text`,
 ## Entwicklung
 
 `./dev.sh` legt die venv an, synchronisiert die Komponente nach `config/` und
-startet Home Assistant im Container auf Port 8123.
+startet Home Assistant im Container auf <http://localhost:8124>. Der Port lässt
+sich per `HTTP_PORT` überschreiben, `--recreate` legt den Container neu an.
 
 ```bash
 uv run python -m ruff check            # Lint
