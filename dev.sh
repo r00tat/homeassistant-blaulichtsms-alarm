@@ -17,9 +17,11 @@ mkdir -p config
 
 rsync -avz custom_components/blaulichtsms_alarm/ config/custom_components/blaulichtsms_alarm/
 
-if [ ! "$(docker ps -a -q -f name=homeassistant)" ]; then
+DOCKER_NAME="hass_blsmsalarm"
+
+if [ ! "$(docker ps -a -q -f name=$DOCKER_NAME)" ]; then
   docker run -d \
-    --name homeassistant \
+    --name $DOCKER_NAME \
     --privileged \
     --restart=unless-stopped \
     -e TZ=Europe/Vienna \
@@ -28,6 +30,6 @@ if [ ! "$(docker ps -a -q -f name=homeassistant)" ]; then
     -p 8123:8123 \
     ghcr.io/home-assistant/home-assistant:stable
 else
-  docker restart homeassistant
+  docker restart $DOCKER_NAME
 fi
-docker logs -n 10 -f homeassistant
+docker logs -n 10 -f $DOCKER_NAME
