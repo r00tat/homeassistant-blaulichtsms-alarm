@@ -20,6 +20,7 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.util import dt as dt_util
 
+from .api import MAX_LIST_LIMIT
 from .const import (
     ATTR_ADDITIONAL_MSISDNS,
     ATTR_ADDRESS,
@@ -31,6 +32,7 @@ from .const import (
     ATTR_GROUP_CODES,
     ATTR_HIDE_TRIGGER_DETAILS,
     ATTR_INDEX_NUMBER,
+    ATTR_LIMIT,
     ATTR_LOCATION,
     ATTR_NEEDS_ACKNOWLEDGEMENT,
     ATTR_RECIPIENT_CONFIRMATION,
@@ -93,6 +95,9 @@ LIST_SCHEMA = vol.Schema(
         vol.Optional(ATTR_CONFIG_ENTRY): cv.string,
         vol.Optional(ATTR_START_DATE): cv.datetime,
         vol.Optional(ATTR_END_DATE): cv.datetime,
+        vol.Optional(ATTR_LIMIT): vol.All(
+            vol.Coerce(int), vol.Range(min=1, max=MAX_LIST_LIMIT)
+        ),
     }
 )
 
@@ -239,6 +244,7 @@ async def async_list_alarms(hass: HomeAssistant, call: ServiceCall) -> ServiceRe
         alarms = await entry.runtime_data.client.list_alarms(
             start_date=call.data.get(ATTR_START_DATE),
             end_date=call.data.get(ATTR_END_DATE),
+            limit=call.data.get(ATTR_LIMIT),
         )
     except BlaulichtSmsAuthError as err:
         entry.async_start_reauth(hass)

@@ -285,6 +285,10 @@
         "end_date": {
           "name": "Bis",
           "description": "Nur Alarme, die vor diesem Zeitpunkt begonnen haben."
+        },
+        "limit": {
+          "name": "Anzahl der Alarme",
+          "description": "Maximale Anzahl der zurückgelieferten Alarme, neuester zuerst. Ohne Angabe werden alle Alarme der Antwort zurückgeliefert. Die API begrenzt die Antwort auf 100 Alarme und kennt keinen Limit-Parameter, die Begrenzung wird daher auf die Antwort angewendet."
         }
       }
     }

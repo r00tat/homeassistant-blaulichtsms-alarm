@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
+import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
@@ -15,13 +16,20 @@ from .const import (
     ATTR_ALARM_TEXT,
     ATTR_CONFIG_ENTRY,
     ATTR_GROUP_CODES,
+    ATTR_LIMIT,
     ATTR_NEEDS_ACKNOWLEDGEMENT,
     ATTR_START_DATE,
     TYPE_ALARM,
     TYPE_INFO,
 )
 from .errors import BlaulichtSmsApiError, BlaulichtSmsAuthError
-from .services import async_list_alarms, async_query_alarm, async_trigger, resolve_entry
+from .services import (
+    LIST_SCHEMA,
+    async_list_alarms,
+    async_query_alarm,
+    async_trigger,
+    resolve_entry,
+)
 
 _MODULE = "custom_components.blaulichtsms_alarm.services"
 
@@ -260,7 +268,15 @@ class TestQueryAndList(unittest.IsolatedAsyncioTestCase):
         end = datetime(2026, 1, 2, tzinfo=UTC)
         await async_list_alarms(_hass(entry), _call(start_date=start, end_date=end))
         entry.runtime_data.client.list_alarms.assert_awaited_once_with(
-            start_date=start, end_date=end
+            start_date=start, end_date=end, limit=None
+        )
+
+    async def test_list_forwards_the_limit(self):
+        """The limit field is handed to the client."""
+        entry = _entry()
+        await async_list_alarms(_hass(entry), _call(limit=5))
+        entry.runtime_data.client.list_alarms.assert_awaited_once_with(
+            start_date=None, end_date=None, limit=5
         )
 
     async def test_query_uses_the_selected_entry(self):
@@ -271,6 +287,28 @@ class TestQueryAndList(unittest.IsolatedAsyncioTestCase):
         )
         second.runtime_data.client.query.assert_awaited_once()
         first.runtime_data.client.query.assert_not_awaited()
+
+
+class TestListSchema(unittest.TestCase):
+    """Validation of the list_alarms service fields."""
+
+    def test_accepts_a_limit_within_the_api_cap(self):
+        """The API never returns more than 100 alarms."""
+        self.assertEqual(LIST_SCHEMA({ATTR_LIMIT: 100})[ATTR_LIMIT], 100)
+
+    def test_rejects_a_limit_above_the_api_cap(self):
+        """A limit that cannot be honoured is refused up front."""
+        with self.assertRaises(vol.Invalid):
+            LIST_SCHEMA({ATTR_LIMIT: 101})
+
+    def test_rejects_a_limit_below_one(self):
+        """Asking for no alarms at all is pointless."""
+        with self.assertRaises(vol.Invalid):
+            LIST_SCHEMA({ATTR_LIMIT: 0})
+
+    def test_the_limit_is_optional(self):
+        """Without a limit the full response is returned."""
+        self.assertNotIn(ATTR_LIMIT, LIST_SCHEMA({}))
 
 
 if __name__ == "__main__":

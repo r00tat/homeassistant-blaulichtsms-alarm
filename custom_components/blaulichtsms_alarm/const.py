@@ -33,6 +33,7 @@ ATTR_ADDRESS = "address"
 ATTR_START_DATE = "start_date"
 ATTR_END_DATE = "end_date"
 ATTR_ALARM_ID = "alarm_id"
+ATTR_LIMIT = "limit"
 
 TYPE_ALARM = "alarm"
 TYPE_INFO = "info"

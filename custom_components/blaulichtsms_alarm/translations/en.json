@@ -285,6 +285,10 @@
         "end_date": {
           "name": "Until",
           "description": "Only alarms that started before this point in time."
+        },
+        "limit": {
+          "name": "Number of alarms",
+          "description": "Maximum number of alarms to return, newest first. Without it every alarm of the response is returned. The API caps the response at 100 alarms and has no limit parameter, so the limit is applied to the response."
         }
       }
     }
