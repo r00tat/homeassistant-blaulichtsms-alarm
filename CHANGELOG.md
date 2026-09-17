@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.2.1](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/compare/0.2.0...0.2.1) (2026-09-17)
+
+
+### Bug Fixes
+
+* **deps:** update homeassistant requirement ([#6](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/6)) ([de91f13](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/de91f13d102b5ee44b0be88bb789b8f411347cac))
+* **deps:** update ruff requirement from ~=0.16.3 to ~=0.16.6 ([#3](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/3)) ([ab8a9e2](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/ab8a9e206fd30d37f9e3945457bf528bddccb830))
+* **deps:** update ruff requirement from ~=0.16.6 to ~=0.16.7 ([#7](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/7)) ([b4cc73f](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/b4cc73fbaeb2483f4742949cbdd5ce366d19e81f))
+
+
+### Documentation
+
+* HACS-Button ergänzen und Lizenz auf GPLv3 korrigieren ([#4](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/4)) ([7f30381](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/7f3038123cbba64e819446fc2b72363b176369f7))
+
+
+### Continuous Integration
+
+* alle Commit-Typen im Changelog ausweisen ([#9](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/9)) ([b877ce2](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/b877ce2ef6c1d65f4b1d3c51abfb93f51ea4d13e))
+* Vorarbeit für die Aufnahme in den HACS Default Store ([#8](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/8)) ([9a3a991](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/9a3a9916fd09586072196ccc303d214e66767bda))
+
 ## [0.2.0](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/compare/0.1.0...0.2.0) (2026-09-07)
 
 
