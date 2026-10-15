@@ -6,9 +6,17 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "fix(deps)"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     commit-message:
       prefix: "ci"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
