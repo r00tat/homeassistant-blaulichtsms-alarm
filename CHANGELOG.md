@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.2](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/compare/0.2.1...0.2.2) (2026-10-15)
+
+
+### Bug Fixes
+
+* **deps:** update aiohttp requirement from &gt;=3.14.3 to &gt;=3.14.4 ([#18](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/18)) ([2c6a065](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/2c6a065bb3290563d147bf8a7d43e722f4016174))
+* **deps:** update ruff requirement from ~=0.16.7 to ~=0.17.0 ([#19](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/19)) ([f980e00](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/f980e00fa837aae2fa1fc42e6f77deb3278ed2d4))
+
+
+### Continuous Integration
+
+* Dependabot-Updates gruppieren ([#21](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/21)) ([af681e4](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/af681e40f0a60e4fbd01db6917ba36e5dfd6deb8))
+
 ## [0.2.1](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/compare/0.2.0...0.2.1) (2026-09-17)
 
 
