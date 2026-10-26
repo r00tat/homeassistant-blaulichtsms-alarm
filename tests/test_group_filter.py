@@ -2,7 +2,7 @@
 
 import unittest
 
-from .group_filter import (
+from custom_components.blaulichtsms_alarm.group_filter import (
     GroupNotAllowedError,
     GroupsRequiredError,
     parse_group_filter,

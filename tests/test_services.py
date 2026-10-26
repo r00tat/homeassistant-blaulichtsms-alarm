@@ -8,10 +8,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import aiohttp
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-
-from .const import (
+from custom_components.blaulichtsms_alarm.const import (
     ATTR_ADDITIONAL_MSISDNS,
     ATTR_ALARM_TEXT,
     ATTR_CONFIG_ENTRY,
@@ -22,14 +19,19 @@ from .const import (
     TYPE_ALARM,
     TYPE_INFO,
 )
-from .errors import BlaulichtSmsApiError, BlaulichtSmsAuthError
-from .services import (
+from custom_components.blaulichtsms_alarm.errors import (
+    BlaulichtSmsApiError,
+    BlaulichtSmsAuthError,
+)
+from custom_components.blaulichtsms_alarm.services import (
     LIST_SCHEMA,
     async_list_alarms,
     async_query_alarm,
     async_trigger,
     resolve_entry,
 )
+from homeassistant.config_entries import ConfigEntryState
+from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 
 _MODULE = "custom_components.blaulichtsms_alarm.services"
 

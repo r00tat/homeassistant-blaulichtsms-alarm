@@ -5,17 +5,19 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
 
-from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
-
-from . import async_setup_entry
-from .const import (
+from custom_components.blaulichtsms_alarm import async_setup_entry
+from custom_components.blaulichtsms_alarm.const import (
     CONF_CUSTOMER_ID,
     CONF_GROUP_FILTER,
     CONF_PASSWORD,
     CONF_USE_STAGING,
     CONF_USERNAME,
 )
-from .errors import BlaulichtSmsApiError, BlaulichtSmsAuthError
+from custom_components.blaulichtsms_alarm.errors import (
+    BlaulichtSmsApiError,
+    BlaulichtSmsAuthError,
+)
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 
 _DATA = {
     CONF_CUSTOMER_ID: "100027",

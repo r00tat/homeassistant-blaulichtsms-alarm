@@ -2,14 +2,19 @@
 
 import unittest
 
-from .const import (
+from custom_components.blaulichtsms_alarm.const import (
     CONF_CUSTOMER_ID,
     CONF_GROUP_FILTER,
     CONF_PASSWORD,
     CONF_USE_STAGING,
     CONF_USERNAME,
 )
-from .schema import build_title, build_unique_id, groups_schema, user_schema
+from custom_components.blaulichtsms_alarm.schema import (
+    build_title,
+    build_unique_id,
+    groups_schema,
+    user_schema,
+)
 
 
 class TestUniqueId(unittest.TestCase):
