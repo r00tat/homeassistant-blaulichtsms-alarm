@@ -18,11 +18,14 @@ The venv is managed with [`uv`](https://docs.astral.sh/uv/). Bootstrap with
 ```bash
 uv run python -m ruff check                                              # lint
 uv run python -m unittest discover -v                                    # all tests
-uv run python -m unittest custom_components.blaulichtsms_alarm.test_api -v
+uv run python -m unittest tests.test_api -v
 ```
 
-No test touches the network. Async tests use `unittest.IsolatedAsyncioTestCase`,
-`hass` is stubbed with `MagicMock`.
+Tests live in `tests/` at the repository root, outside the component, so they
+are not shipped to users; they import the component by its absolute
+`custom_components.blaulichtsms_alarm` path. No test touches the network.
+Async tests use `unittest.IsolatedAsyncioTestCase`, `hass` is stubbed with
+`MagicMock`.
 
 ## Architecture
 

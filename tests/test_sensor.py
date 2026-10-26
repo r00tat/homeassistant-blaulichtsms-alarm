@@ -5,8 +5,11 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import MagicMock
 
-from .const import TYPE_ALARM
-from .sensor import BlaulichtSmsLastTriggeredSensor, parse_restored_state
+from custom_components.blaulichtsms_alarm.const import TYPE_ALARM
+from custom_components.blaulichtsms_alarm.sensor import (
+    BlaulichtSmsLastTriggeredSensor,
+    parse_restored_state,
+)
 
 _TRIGGERED_AT = datetime(2026, 9, 6, 12, 0, tzinfo=UTC)
 _LAST_ALARM = {

@@ -3,7 +3,7 @@
 from datetime import UTC, datetime, timedelta, timezone
 import unittest
 
-from .api import (
+from custom_components.blaulichtsms_alarm.api import (
     STAGING_BASE_URL,
     AlarmApiClient,
     build_trigger_payload,
@@ -12,7 +12,10 @@ from .api import (
     redact_payload,
     select_latest_alarms,
 )
-from .errors import BlaulichtSmsApiError, BlaulichtSmsAuthError
+from custom_components.blaulichtsms_alarm.errors import (
+    BlaulichtSmsApiError,
+    BlaulichtSmsAuthError,
+)
 
 
 class TestFormatApiDatetime(unittest.TestCase):

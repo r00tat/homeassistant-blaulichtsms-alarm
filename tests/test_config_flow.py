@@ -5,20 +5,23 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
 
-from .config_flow import (
+from custom_components.blaulichtsms_alarm.config_flow import (
     BlaulichtSmsAlarmConfigFlow,
     BlaulichtSmsAlarmOptionsFlow,
     CredentialCheck,
     validate_credentials,
 )
-from .const import (
+from custom_components.blaulichtsms_alarm.const import (
     CONF_CUSTOMER_ID,
     CONF_GROUP_FILTER,
     CONF_PASSWORD,
     CONF_USE_STAGING,
     CONF_USERNAME,
 )
-from .errors import BlaulichtSmsApiError, BlaulichtSmsAuthError
+from custom_components.blaulichtsms_alarm.errors import (
+    BlaulichtSmsApiError,
+    BlaulichtSmsAuthError,
+)
 
 _CREDENTIALS = {
     CONF_CUSTOMER_ID: "100027",

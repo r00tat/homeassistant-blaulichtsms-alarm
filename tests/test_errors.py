@@ -2,7 +2,11 @@
 
 import unittest
 
-from .errors import BlaulichtSmsApiError, BlaulichtSmsAuthError, BlaulichtSmsError
+from custom_components.blaulichtsms_alarm.errors import (
+    BlaulichtSmsApiError,
+    BlaulichtSmsAuthError,
+    BlaulichtSmsError,
+)
 
 
 class TestErrors(unittest.TestCase):
