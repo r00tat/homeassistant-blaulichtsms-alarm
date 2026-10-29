@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.2.2](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/compare/0.2.1...0.2.2) (2026-10-29)
+
+
+### Bug Fixes
+
+* **deps:** bump the dependencies group across 1 directory with 3 updates ([#24](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/24)) ([9e99054](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/9e99054c6b74ff5d2a0d7bb80d965967f782e982))
+* **deps:** update aiohttp requirement from &gt;=3.14.3 to &gt;=3.14.4 ([#18](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/18)) ([2c6a065](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/2c6a065bb3290563d147bf8a7d43e722f4016174))
+* **deps:** update ruff requirement from ~=0.16.7 to ~=0.17.0 ([#19](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/19)) ([f980e00](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/f980e00fa837aae2fa1fc42e6f77deb3278ed2d4))
+
+
+### Tests
+
+* Tests aus der Komponente nach tests/ verschieben ([#25](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/25)) ([9916d92](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/9916d924c44f58ae213dd30cef600ae3b57595bc))
+
+
+### Continuous Integration
+
+* bump the dependencies group across 1 directory with 2 updates ([#27](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/27)) ([0da8c05](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/0da8c054b4fe0cb96f160bbb1179fb0ef879f269))
+* Dependabot-Updates gruppieren ([#21](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/21)) ([af681e4](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/af681e40f0a60e4fbd01db6917ba36e5dfd6deb8))
+* HACS installiert das Release-ZIP ([#26](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/26)) ([3d5954a](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/3d5954a19e83ebf3650e7c83d115255a61c1131e))
+
 ## [0.2.1](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/compare/0.2.0...0.2.1) (2026-09-17)
 
 
