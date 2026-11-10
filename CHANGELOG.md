@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/compare/0.2.2...0.2.3) (2026-11-10)
+
+
+### Bug Fixes
+
+* **deps:** bump the dependencies group with 2 updates ([#30](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/issues/30)) ([168090d](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commit/168090dce0e435828db782ecd33c8bcc8e136e53))
+
 ## [0.2.2](https://github.com/r00tat/homeassistant-blaulichtsms-alarm/compare/0.2.1...0.2.2) (2026-11-05)
 
 
