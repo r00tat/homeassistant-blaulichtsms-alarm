@@ -19,10 +19,22 @@ als die des Einsatzmonitors.
 
 ## Installation
 
-[![In Home Assistant öffnen und dieses Repository in HACS hinzufügen.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=r00tat&repository=homeassistant-blaulichtsms-alarm&category=integration)
+Die Integration ist im Standardkatalog von [HACS](https://hacs.xyz/)
+enthalten:
 
-Der Button öffnet das Repository direkt in HACS. Danach installieren und Home
-Assistant neu starten. Alternativ von Hand:
+1. HACS öffnen und nach **blaulichtSMS Alarm** suchen
+2. Herunterladen und Home Assistant neu starten
+3. Unter Einstellungen → Geräte & Dienste die Integration
+   **blaulichtSMS Alarm** hinzufügen und dem Wizard folgen
+
+Alternativ öffnet dieser Button die Integration direkt in HACS:
+
+[![In Home Assistant öffnen und dieses Repository in HACS anzeigen.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=r00tat&repository=homeassistant-blaulichtsms-alarm&category=integration)
+
+### Fallback: benutzerdefiniertes Repository
+
+Nur nötig, wenn die Integration in der HACS-Suche nicht auftaucht, etwa bei
+einer älteren HACS-Version:
 
 1. HACS öffnen, 3 Punkte, "Benutzerdefinierte Repositories"
 2. `https://github.com/r00tat/homeassistant-blaulichtsms-alarm` als Repository,
