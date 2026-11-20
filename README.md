@@ -1,5 +1,14 @@
 # blaulichtSMS Alarm für Home Assistant
 
+[![GitHub Release][releases-shield]][releases]
+[![GitHub Activity][commits-shield]][commits]
+[![License][license-shield]](LICENSE)
+[![Marketplace][marketplace-shield]][marketplace]
+[![Validate][validate-shield]][validate]
+
+![Project Maintenance][maintenance-shield]
+[![BuyMeCoffee][buymecoffeebadge]][buymecoffee]
+
 Home-Assistant-Integration, mit der aus Automatisierungen heraus
 [blaulichtSMS](https://blaulichtsms.net/) Alarme, Infos und Termine **ausgelöst**
 werden können.
@@ -178,3 +187,16 @@ uv run python -m unittest discover -v  # Tests
 
 Diese Software steht in keiner Verbindung zu blaulichtSMS. Lizenziert unter
 [GNU General Public License v3.0](LICENSE).
+
+[buymecoffee]: https://www.buymeacoffee.com/r00tat
+[buymecoffeebadge]: https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg?style=for-the-badge
+[commits-shield]: https://img.shields.io/github/commit-activity/y/r00tat/homeassistant-blaulichtsms-alarm.svg?style=for-the-badge
+[commits]: https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commits/main
+[license-shield]: https://img.shields.io/github/license/r00tat/homeassistant-blaulichtsms-alarm.svg?style=for-the-badge
+[maintenance-shield]: https://img.shields.io/badge/maintainer-%40r00tat-blue.svg?style=for-the-badge
+[marketplace-shield]: https://img.shields.io/badge/Marketplace-Default-41BDF5.svg?style=for-the-badge
+[marketplace]: https://www.home-assistant.io/integrations/marketplace/
+[releases-shield]: https://img.shields.io/github/v/release/r00tat/homeassistant-blaulichtsms-alarm.svg?style=for-the-badge
+[releases]: https://github.com/r00tat/homeassistant-blaulichtsms-alarm/releases
+[validate-shield]: https://img.shields.io/github/actions/workflow/status/r00tat/homeassistant-blaulichtsms-alarm/validate.yml?branch=main&label=validate&style=for-the-badge
+[validate]: https://github.com/r00tat/homeassistant-blaulichtsms-alarm/actions/workflows/validate.yml
