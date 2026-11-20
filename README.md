@@ -1,5 +1,14 @@
 # blaulichtSMS Alarm für Home Assistant
 
+[![GitHub Release][releases-shield]][releases]
+[![GitHub Activity][commits-shield]][commits]
+[![License][license-shield]](LICENSE)
+[![Marketplace][marketplace-shield]][marketplace]
+[![Validate][validate-shield]][validate]
+
+![Project Maintenance][maintenance-shield]
+[![BuyMeCoffee][buymecoffeebadge]][buymecoffee]
+
 Home-Assistant-Integration, mit der aus Automatisierungen heraus
 [blaulichtSMS](https://blaulichtsms.net/) Alarme, Infos und Termine **ausgelöst**
 werden können.
@@ -19,16 +28,38 @@ als die des Einsatzmonitors.
 
 ## Installation
 
-[![In Home Assistant öffnen und dieses Repository in HACS hinzufügen.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=r00tat&repository=homeassistant-blaulichtsms-alarm&category=integration)
+Die Integration ist im Katalog des
+[Marketplace](https://www.home-assistant.io/integrations/marketplace/)
+enthalten, der seit Home Assistant 2026.11 fest eingebaut ist und HACS
+ablöst:
 
-Der Button öffnet das Repository direkt in HACS. Danach installieren und Home
-Assistant neu starten. Alternativ von Hand:
+1. Einstellungen → Marketplace öffnen und nach **blaulichtSMS Alarm** suchen
+2. Installieren. Danach öffnet sich der Wizard der Integration, alternativ
+   unter Einstellungen → Geräte & Dienste die Integration
+   **blaulichtSMS Alarm** hinzufügen
 
-1. HACS öffnen, 3 Punkte, "Benutzerdefinierte Repositories"
-2. `https://github.com/r00tat/homeassistant-blaulichtsms-alarm` als Repository,
-   Kategorie `Integration`
-3. "blaulichtSMS Alarm" installieren und Home Assistant neu starten
-4. Integration hinzufügen und dem Wizard folgen
+Alternativ öffnet dieser Button die Integration direkt im Marketplace:
+
+[![Integration im Marketplace von Home Assistant öffnen.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=r00tat&repository=homeassistant-blaulichtsms-alarm&category=integration)
+
+### Home Assistant 2026.9 und 2026.10 mit HACS
+
+Vor 2026.11 gibt es den Marketplace noch nicht. Dort ist die Integration im
+Standardkatalog von [HACS](https://hacs.xyz/) zu finden:
+
+1. HACS öffnen und nach **blaulichtSMS Alarm** suchen
+2. Herunterladen und Home Assistant neu starten
+3. Unter Einstellungen → Geräte & Dienste die Integration
+   **blaulichtSMS Alarm** hinzufügen und dem Wizard folgen
+
+### Fallback: aus GitHub-Link hinzufügen
+
+Nur nötig, wenn die Integration in der Suche nicht auftaucht. Im Marketplace
+oben rechts **Add from link** wählen (dafür ist eine GitHub-Verbindung nötig,
+der Marketplace fragt danach) und
+`https://github.com/r00tat/homeassistant-blaulichtsms-alarm` eintragen. In
+HACS heißt der Weg 3 Punkte → "Benutzerdefinierte Repositories", Kategorie
+`Integration`.
 
 ## Einrichtung
 
@@ -156,3 +187,16 @@ uv run python -m unittest discover -v  # Tests
 
 Diese Software steht in keiner Verbindung zu blaulichtSMS. Lizenziert unter
 [GNU General Public License v3.0](LICENSE).
+
+[buymecoffee]: https://www.buymeacoffee.com/r00tat
+[buymecoffeebadge]: https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg?style=for-the-badge
+[commits-shield]: https://img.shields.io/github/commit-activity/y/r00tat/homeassistant-blaulichtsms-alarm.svg?style=for-the-badge
+[commits]: https://github.com/r00tat/homeassistant-blaulichtsms-alarm/commits/main
+[license-shield]: https://img.shields.io/github/license/r00tat/homeassistant-blaulichtsms-alarm.svg?style=for-the-badge
+[maintenance-shield]: https://img.shields.io/badge/maintainer-%40r00tat-blue.svg?style=for-the-badge
+[marketplace-shield]: https://img.shields.io/badge/Marketplace-Default-41BDF5.svg?style=for-the-badge
+[marketplace]: https://www.home-assistant.io/integrations/marketplace/
+[releases-shield]: https://img.shields.io/github/v/release/r00tat/homeassistant-blaulichtsms-alarm.svg?style=for-the-badge
+[releases]: https://github.com/r00tat/homeassistant-blaulichtsms-alarm/releases
+[validate-shield]: https://img.shields.io/github/actions/workflow/status/r00tat/homeassistant-blaulichtsms-alarm/validate.yml?branch=main&label=validate&style=for-the-badge
+[validate]: https://github.com/r00tat/homeassistant-blaulichtsms-alarm/actions/workflows/validate.yml
